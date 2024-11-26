@@ -2,18 +2,13 @@
 
 import { cn } from "@/lib/utils";
 import Image from "next/image";
-import { useState } from "react";
 
-const ImageSelection = () => {
-  const [file, setFile] = useState<File | undefined>(undefined);
+type ImageSelectionProps = {
+  onFileSelected: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  file: File | undefined;
+};
 
-  const onFileSelected = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (files && files.length > 0) {
-      setFile(files[0]);
-    }
-  };
-
+const ImageSelection = ({ onFileSelected, file }: ImageSelectionProps) => {
   return (
     <div className="space-y-3">
       <label htmlFor="">Select Image of your room</label>
