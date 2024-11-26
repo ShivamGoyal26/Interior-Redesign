@@ -7,4 +7,5 @@ export type UserDetailContextType = {
     email: string;
     image_url: string;
   };
+  setUserDetail: (props: UserDetailContextType["userDetail"]) => void;
 };

@@ -13,9 +13,9 @@ const queryClient = new QueryClient();
 
 const Provider = ({ children }: { children: React.ReactNode }) => {
   const { user } = useUser();
-  const [userDetail, setUserDetail] = useState<null | UserDetailContextType>(
-    null
-  );
+  const [userDetail, setUserDetail] = useState<
+    null | UserDetailContextType["userDetail"]
+  >(null);
 
   const verifyUser = useCallback(async () => {
     try {
@@ -35,7 +35,18 @@ const Provider = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <userDetailContext.Provider value={{ userDetail, setUserDetail }}>
+      <userDetailContext.Provider
+        value={{
+          userDetail: userDetail || {
+            credits: "",
+            id: "",
+            name: "",
+            email: "",
+            image_url: "",
+          },
+          setUserDetail,
+        }}
+      >
         {children}
       </userDetailContext.Provider>
     </QueryClientProvider>
