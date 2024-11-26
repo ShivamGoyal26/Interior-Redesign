@@ -1,6 +1,5 @@
 import { db } from "@/db";
 import { usersTable } from "@/db/schema";
-import { User } from "@clerk/nextjs/server";
 import { eq } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 

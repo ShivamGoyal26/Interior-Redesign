@@ -1,10 +1,9 @@
-import { UserButton } from "@clerk/nextjs";
+import Listings from "./_components/listings";
 
 const Dashboard = () => {
   return (
-    <div>
-      <p>Dashboard</p>
-      <UserButton />
+    <div className="flex flex-col min-h-screen">
+      <Listings />
     </div>
   );
 };

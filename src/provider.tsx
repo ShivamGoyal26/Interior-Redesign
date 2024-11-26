@@ -1,8 +1,14 @@
 "use client";
+
 import { useUser } from "@clerk/nextjs";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import axios from "axios";
 import React, { useEffect, useCallback, useState } from "react";
+
+// Files
 import { userDetailContext } from "./contexts/userDetailContext";
+
+const queryClient = new QueryClient();
 
 const Provider = ({ children }: { children: React.ReactNode }) => {
   const { user } = useUser();
@@ -25,9 +31,11 @@ const Provider = ({ children }: { children: React.ReactNode }) => {
   }, [user, verifyUser]);
 
   return (
-    <userDetailContext.Provider value={{ userDetail, setUserDetail }}>
-      {children}
-    </userDetailContext.Provider>
+    <QueryClientProvider client={queryClient}>
+      <userDetailContext.Provider value={{ userDetail, setUserDetail }}>
+        {children}
+      </userDetailContext.Provider>
+    </QueryClientProvider>
   );
 };
 
