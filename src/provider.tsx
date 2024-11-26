@@ -7,12 +7,15 @@ import React, { useEffect, useCallback, useState } from "react";
 
 // Files
 import { userDetailContext } from "./contexts/userDetailContext";
+import { UserDetailContextType } from "./types/userDetail";
 
 const queryClient = new QueryClient();
 
 const Provider = ({ children }: { children: React.ReactNode }) => {
   const { user } = useUser();
-  const [userDetail, setUserDetail] = useState<null | unknown>(null);
+  const [userDetail, setUserDetail] = useState<null | UserDetailContextType>(
+    null
+  );
 
   const verifyUser = useCallback(async () => {
     try {

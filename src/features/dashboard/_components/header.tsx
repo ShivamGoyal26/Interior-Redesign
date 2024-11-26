@@ -2,12 +2,15 @@
 
 import { Button } from "@/components/ui/button";
 import { userDetailContext } from "@/contexts/userDetailContext";
+import { UserDetailContextType } from "@/types/userDetail";
 import { UserButton } from "@clerk/nextjs";
 import Image from "next/image";
 import { useContext } from "react";
 
 const Header = () => {
-  const { userDetail } = useContext(userDetailContext);
+  const { userDetail } = useContext<UserDetailContextType | undefined>(
+    userDetailContext
+  ) || { userDetail: { credits: 0 } };
 
   return (
     <div className="p-5 shadow-sm flex justify-between items-center">
