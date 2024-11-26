@@ -2,7 +2,7 @@ import Dashboard from "@/features/dashboard";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Dashboard | AI Room Redesigner",
+  title: "AI Room Redesigner",
   description:
     "View and manage your room redesign projects, saved designs, and personalized recommendations",
   openGraph: {
