@@ -1,30 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
-
-const s3Client = new S3Client({
-  region: process.env.NEXT_PUBLIC_S3_REGION!,
-  credentials: {
-    accessKeyId: process.env.NEXT_PUBLIC_S3_ACCESS_KEY_ID!,
-    secretAccessKey: process.env.NEXT_PUBLIC_S3_ACCESS_SECRET_KEY!,
-  },
-});
-
-async function uploadFileToS3(file: Buffer, fileName: string) {
-  const objectKey = `${fileName}-${Date.now()}`;
-
-  const params = {
-    Bucket: process.env.NEXT_PUBLIC_S3_BUCKET_NAME!,
-    Key: objectKey,
-    Body: file,
-    ContentType: "image/jpg",
-  };
-
-  const command = new PutObjectCommand(params);
-  await s3Client.send(command);
-
-  // Return the object key
-  return objectKey;
-}
+import { uploadFileBufferToS3 } from "@/utils/s3-utils";
 
 export async function POST(request: NextRequest) {
   try {
@@ -39,10 +14,7 @@ export async function POST(request: NextRequest) {
     }
 
     const buffer = Buffer.from(await file.arrayBuffer());
-    const objectKey = await uploadFileToS3(buffer, file.name);
-
-    // Construct the file URL
-    const fileUrl = `https://${process.env.NEXT_PUBLIC_S3_BUCKET_NAME}.s3.${process.env.NEXT_PUBLIC_S3_REGION}.amazonaws.com/${objectKey}`;
+    const fileUrl = await uploadFileBufferToS3(buffer, file.name, "image/jpg");
 
     return NextResponse.json(
       { isSuccess: true, data: fileUrl },

@@ -1,11 +1,13 @@
 "use client";
 
-import { useReducer } from "react";
+import { useContext, useReducer } from "react";
 
 // files
 import ImageSelection from "./_components/image-selection";
 import RoomForm from "./_components/room-form";
 import axios from "axios";
+import { UserDetailContextType } from "@/types/userDetail";
+import { userDetailContext } from "@/contexts/userDetailContext";
 
 // Define the state type
 type State = {
@@ -41,6 +43,10 @@ const reducer = (state: State, action: Action): State => {
 };
 
 const CreateNew = () => {
+  const { userDetail } = useContext<UserDetailContextType | undefined>(
+    userDetailContext
+  ) || { userDetail: { credits: 0 } };
+
   const [state, dispatch] = useReducer(reducer, {
     file: undefined,
     loading: false,
@@ -66,14 +72,14 @@ const CreateNew = () => {
       dispatch({ type: "SET_LOADING", payload: true });
       const uploadedImage = await axios.post("/api/s3-upload", formData);
       if (uploadedImage.data.isSuccess) {
-        console.log(uploadedImage.data.data);
         const originalImage = uploadedImage.data.data;
-        const aiGeneratedImage = await axios.post("/api/redesign-room", {
+        const response = await axios.post("/api/redesign-room", {
           ...params,
           originalImage,
+          userEmail: userDetail.email,
+          credits: userDetail.credits,
         });
-
-        console.log("aiGeneratedImage", aiGeneratedImage);
+        console.log(response);
       } else {
         dispatch({ type: "SET_ERROR", payload: uploadedImage.data.error });
       }
