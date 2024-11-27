@@ -31,15 +31,15 @@ const RoomForm = ({ regenerateImage, loading }: RoomForm) => {
     resolver: zodResolver(designRoomSchema),
     mode: "all",
     defaultValues: {
-      description: "",
+      prompt: "",
       roomType: "", // Default value for roomType
       designType: "",
     },
   });
 
-  const {
-    formState: { isValid },
-  } = form;
+  // const {
+  //   formState: { isValid },
+  // } = form;
 
   async function onSubmit(data: z.infer<typeof designRoomSchema>) {
     regenerateImage(data);
@@ -81,18 +81,17 @@ const RoomForm = ({ regenerateImage, loading }: RoomForm) => {
         {/* Description Field */}
         <FormField
           control={form.control}
-          name="description"
+          name="prompt"
           render={({ field }) => (
             <FormItem>
               <FormLabel className="text-slate-500 text-sm font-normal">
-                {"Description"}{" "}
-                <span className="text-destructive font-bold">*</span>
+                {"Prompt"} <span className="text-destructive font-bold">*</span>
               </FormLabel>
               <FormControl className="focus-visible:ring-0 focus-visible:ring-offset-0">
                 <Textarea
                   disabled={loading}
                   className="focus-visible:bg-secondary text-base"
-                  placeholder="Additional Description"
+                  placeholder="Enter Prompt"
                   {...field}
                 />
               </FormControl>
