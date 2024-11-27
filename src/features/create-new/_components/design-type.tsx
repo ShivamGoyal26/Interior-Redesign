@@ -44,7 +44,7 @@ const DesignType = ({ value, error, onDesignTypeChange }: DesignTypeProps) => {
               <Image
                 className={cn(
                   "h-[70px] rounded-md hover:scale-105 transition-all cursor-pointer",
-                  value === item.type && "border-2 border-primary"
+                  value === item.type && "border-2 border-purple-600"
                 )}
                 src={item.image}
                 width={100}

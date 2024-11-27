@@ -8,7 +8,7 @@ const EmptyData = () => {
       <Image
         className="rounded-lg shadow-lg mb-4"
         alt="Room preview"
-        src="/dashboard-room.jpg"
+        src="/bedroom.jpg"
         width={500}
         height={300}
       />
