@@ -21,7 +21,7 @@ type Action =
   | { type: "SET_ERROR"; payload: string };
 
 export type RegenerateImageProps = {
-  description: string;
+  prompt: string;
   roomType: string;
   designType: string;
 };
@@ -67,6 +67,13 @@ const CreateNew = () => {
       const uploadedImage = await axios.post("/api/s3-upload", formData);
       if (uploadedImage.data.isSuccess) {
         console.log(uploadedImage.data.data);
+        const originalImage = uploadedImage.data.data;
+        const aiGeneratedImage = await axios.post("/api/redesign-room", {
+          ...params,
+          originalImage,
+        });
+
+        console.log("aiGeneratedImage", aiGeneratedImage);
       } else {
         dispatch({ type: "SET_ERROR", payload: uploadedImage.data.error });
       }
