@@ -18,15 +18,25 @@ type RoomTypeProps = {
   value: string;
   onRoomTypeChange: (value: string) => void;
   error?: string;
+  loading: boolean;
 };
 
-const RoomType = ({ value, onRoomTypeChange, error }: RoomTypeProps) => {
+const RoomType = ({
+  value,
+  onRoomTypeChange,
+  error,
+  loading,
+}: RoomTypeProps) => {
   return (
     <div>
       <label className="text-slate-500 mb-2 text-sm font-normal">
         Select Room Type <span className="text-destructive font-bold"> *</span>
       </label>
-      <Select onValueChange={onRoomTypeChange} defaultValue={value}>
+      <Select
+        disabled={loading}
+        onValueChange={onRoomTypeChange}
+        defaultValue={value}
+      >
         <SelectTrigger className="w-full">
           <SelectValue placeholder="Room Type" />
         </SelectTrigger>

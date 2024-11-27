@@ -28,9 +28,15 @@ type DesignTypeProps = {
   value: string;
   onDesignTypeChange: (value: string) => void;
   error?: string;
+  loading: boolean;
 };
 
-const DesignType = ({ value, error, onDesignTypeChange }: DesignTypeProps) => {
+const DesignType = ({
+  value,
+  error,
+  onDesignTypeChange,
+  loading,
+}: DesignTypeProps) => {
   return (
     <div className="space-y-2">
       <label className="text-slate-500 mb-2 text-sm font-normal">
@@ -40,7 +46,10 @@ const DesignType = ({ value, error, onDesignTypeChange }: DesignTypeProps) => {
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
         {roomTypes.map((item) => {
           return (
-            <div onClick={() => onDesignTypeChange(item.type)} key={item.type}>
+            <div
+              onClick={() => !loading && onDesignTypeChange(item.type)}
+              key={item.type}
+            >
               <Image
                 className={cn(
                   "h-[70px] rounded-md hover:scale-105 transition-all cursor-pointer",
