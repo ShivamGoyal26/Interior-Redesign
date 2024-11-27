@@ -18,8 +18,15 @@ import { Button } from "@/components/ui/button";
 import { designRoomSchema } from "../utils";
 import RoomType from "./room-type";
 import DesignType from "./design-type";
+import { RegenerateImageProps } from "..";
+import { Loader2 } from "lucide-react";
 
-const RoomForm = () => {
+type RoomForm = {
+  loading: boolean;
+  regenerateImage: (params: RegenerateImageProps) => void;
+};
+
+const RoomForm = ({ regenerateImage, loading }: RoomForm) => {
   const form = useForm<z.infer<typeof designRoomSchema>>({
     resolver: zodResolver(designRoomSchema),
     mode: "all",
@@ -35,7 +42,7 @@ const RoomForm = () => {
   } = form;
 
   async function onSubmit(data: z.infer<typeof designRoomSchema>) {
-    console.log("Submitted data:", data);
+    regenerateImage(data);
   }
 
   return (
@@ -50,6 +57,7 @@ const RoomForm = () => {
           name="roomType"
           render={({ field, fieldState }) => (
             <RoomType
+              loading={loading}
               value={field.value}
               onRoomTypeChange={field.onChange}
               error={fieldState.error?.message}
@@ -62,6 +70,7 @@ const RoomForm = () => {
           name="designType"
           render={({ field, fieldState }) => (
             <DesignType
+              loading={loading}
               value={field.value}
               onDesignTypeChange={field.onChange}
               error={fieldState.error?.message}
@@ -81,6 +90,7 @@ const RoomForm = () => {
               </FormLabel>
               <FormControl className="focus-visible:ring-0 focus-visible:ring-offset-0">
                 <Textarea
+                  disabled={loading}
                   className="focus-visible:bg-secondary text-base"
                   placeholder="Additional Description"
                   {...field}
@@ -95,10 +105,20 @@ const RoomForm = () => {
         <Button
           className="self-end"
           type="submit"
+          disabled={loading}
           // disabled={!isValid}
         >
-          Submit
+          {loading ? (
+            <div className="flex flex-row gap-2">
+              <h1>Generating...</h1>
+              <Loader2 className="size-10 animate-spin text-white" />
+            </div>
+          ) : (
+            "Submit"
+          )}
         </Button>
+
+        <div className="h-16" />
       </form>
     </Form>
   );

@@ -6,9 +6,14 @@ import Image from "next/image";
 type ImageSelectionProps = {
   onFileSelected: (e: React.ChangeEvent<HTMLInputElement>) => void;
   file: File | undefined;
+  loading: boolean;
 };
 
-const ImageSelection = ({ onFileSelected, file }: ImageSelectionProps) => {
+const ImageSelection = ({
+  onFileSelected,
+  file,
+  loading,
+}: ImageSelectionProps) => {
   return (
     <div className="space-y-3">
       <label htmlFor="">Select Image of your room</label>
@@ -39,6 +44,7 @@ const ImageSelection = ({ onFileSelected, file }: ImageSelectionProps) => {
         </div>
       </label>
       <input
+        disabled={loading}
         onChange={onFileSelected}
         accept="image/*"
         type="file"
