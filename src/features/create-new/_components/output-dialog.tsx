@@ -10,6 +10,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 type OutputDialogProps = {
   result: null | {
@@ -21,6 +22,7 @@ type OutputDialogProps = {
 };
 
 const OutputDialog = ({ result, open, setOpen }: OutputDialogProps) => {
+  const router = useRouter();
   return (
     <AlertDialog open={open}>
       <AlertDialogContent>
@@ -34,7 +36,13 @@ const OutputDialog = ({ result, open, setOpen }: OutputDialogProps) => {
               imageUrl: result ? result.originalImage! : "",
             }}
           />
-          <Button className="self-end" onClick={() => setOpen(false)}>
+          <Button
+            className="self-end"
+            onClick={() => {
+              setOpen(false);
+              router.push("/dashboard");
+            }}
+          >
             Close
           </Button>
         </AlertDialogHeader>

@@ -4,27 +4,27 @@ import Image from "next/image";
 const roomTypes = [
   {
     type: "Modern",
-    image: "/livingroom.jpg", // Replace with an actual image URL
+    image: "/modern.jpg", // Replace with an actual image URL
   },
   {
     type: "Industrial",
-    image: "/bedroom.jpg",
+    image: "/industrial.jpg",
   },
   {
     type: "Bohemian",
-    image: "/kitchen.jpg",
+    image: "/bohemian.jpg",
   },
   {
     type: "Traditional",
-    image: "/bathroom.jpg",
+    image: "/traditional.jpg",
   },
   {
     type: "Rustic",
-    image: "/dinningroom.jpg",
+    image: "/rustic.jpg",
   },
   {
     type: "Minimalist",
-    image: "/dinningroom.jpg",
+    image: "/minimilist.jpg",
   },
 ];
 

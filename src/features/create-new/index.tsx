@@ -1,27 +1,26 @@
 "use client";
 
-import { useContext, useEffect, useReducer, useState } from "react";
+import { useCallback, useContext, useReducer, useState } from "react";
 
-// files
+// Components
 import ImageSelection from "./_components/image-selection";
 import RoomForm from "./_components/room-form";
-import axios from "axios";
-import { UserDetailContextType } from "@/types/userDetail";
-import { userDetailContext } from "@/contexts/userDetailContext";
 import OutputDialog from "./_components/output-dialog";
 
-// Define the state type
+// Utilities
+import axios from "axios";
+import { userDetailContext } from "@/contexts/userDetailContext";
+
+// Types
 type State = {
-  file: File | undefined;
+  file?: File;
   loading: boolean;
   error: string;
 };
 
-// Define the action types
 type Action =
-  | { type: "SET_FILE"; payload: File }
-  | { type: "SET_LOADING"; payload: boolean }
-  | { type: "SET_ERROR"; payload: string };
+  | { type: "SET_STATE"; payload: Partial<State> }
+  | { type: "RESET_ERROR" };
 
 export type RegenerateImageProps = {
   prompt: string;
@@ -29,81 +28,98 @@ export type RegenerateImageProps = {
   designType: string;
 };
 
-// Reducer function
+// Reducer
 const reducer = (state: State, action: Action): State => {
   switch (action.type) {
-    case "SET_FILE":
-      return { ...state, file: action.payload };
-    case "SET_LOADING":
-      return { ...state, loading: action.payload };
-    case "SET_ERROR":
-      return { ...state, error: action.payload };
+    case "SET_STATE":
+      return { ...state, ...action.payload };
+    case "RESET_ERROR":
+      return { ...state, error: "" };
     default:
       return state;
   }
 };
 
-const CreateNew = () => {
-  const { userDetail } = useContext<UserDetailContextType | undefined>(
-    userDetailContext
-  ) || { userDetail: { credits: 0 } };
+const initialState: State = {
+  file: undefined,
+  loading: false,
+  error: "",
+};
 
-  const [state, dispatch] = useReducer(reducer, {
-    file: undefined,
-    loading: false,
-    error: "",
-  });
+const CreateNew = () => {
+  const { userDetail } = useContext(userDetailContext) ?? {
+    userDetail: { credits: 0 },
+  };
+
+  const [state, dispatch] = useReducer(reducer, initialState);
   const [result, setResult] = useState<null | {
     aiImage: string;
     originalImage: string;
   }>(null);
   const [open, setOpen] = useState(false);
 
-  const onFileSelected = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (files && files.length > 0) {
-      dispatch({ type: "SET_FILE", payload: files[0] });
-    }
-  };
+  const onFileSelected = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const file = event.target.files?.[0];
+      if (file) {
+        dispatch({ type: "SET_STATE", payload: { file } });
+      }
+    },
+    []
+  );
 
-  const regenerateImage = async (params: RegenerateImageProps) => {
-    dispatch({ type: "SET_ERROR", payload: "" });
+  const regenerateImage = useCallback(
+    async (params: RegenerateImageProps) => {
+      dispatch({ type: "RESET_ERROR" });
 
-    if (!state.file) {
-      return dispatch({ type: "SET_ERROR", payload: "please select file" });
-    }
-    const formData = new FormData();
-    formData.append("file", state.file);
-    try {
-      dispatch({ type: "SET_LOADING", payload: true });
-      const uploadedImage = await axios.post("/api/s3-upload", formData);
-      if (uploadedImage.data.isSuccess) {
-        const originalImage = uploadedImage.data.data;
+      if (!state.file) {
+        return dispatch({
+          type: "SET_STATE",
+          payload: { error: "Please select a file" },
+        });
+      }
+
+      const formData = new FormData();
+      formData.append("file", state.file);
+
+      try {
+        dispatch({ type: "SET_STATE", payload: { loading: true } });
+
+        // Upload image
+        const uploadedImage = await axios.post("/api/s3-upload", formData);
+        if (!uploadedImage.data.isSuccess) {
+          throw new Error(uploadedImage.data.error || "File upload failed");
+        }
+
+        // Process image
         const response = await axios.post("/api/redesign-room", {
           ...params,
-          originalImage,
+          originalImage: uploadedImage.data.data,
           userEmail: userDetail.email,
           credits: userDetail.credits,
         });
-        if (response.data.isSuccess) {
-          setResult({
-            aiImage: response.data.data.aiGeneratedImage,
-            originalImage: response.data.data.originalImage,
-          });
-          setOpen(true);
+
+        if (!response.data.isSuccess) {
+          throw new Error(response.data.error || "Room redesign failed");
         }
-      } else {
-        dispatch({ type: "SET_ERROR", payload: uploadedImage.data.error });
+
+        setResult({
+          aiImage: response.data.data.aiGeneratedImage,
+          originalImage: response.data.data.originalImage,
+        });
+        setOpen(true);
+      } catch (error: any) {
+        const errorMessage =
+          error.response?.data?.error ||
+          error.message ||
+          "An unknown error occurred";
+        dispatch({ type: "SET_STATE", payload: { error: errorMessage } });
+      } finally {
+        dispatch({ type: "SET_STATE", payload: { loading: false } });
       }
-    } catch (error: any) {
-      let errorMessage = error.response.data?.isSuccess
-        ? error.response.data.error
-        : error.message;
-      dispatch({ type: "SET_ERROR", payload: errorMessage });
-    } finally {
-      dispatch({ type: "SET_LOADING", payload: false });
-    }
-  };
+    },
+    [state.file, userDetail]
+  );
 
   return (
     <div>
@@ -112,26 +128,21 @@ const CreateNew = () => {
         Experience the Magic of AI Remodeling
       </h2>
       <p className="text-gray-500 text-center mt-2">
-        Transform any room with a click. Select a space, choose a style, watch
-        as AI instantly reimagines your enviornment
+        Transform any room with a click. Select a space, choose a style, and
+        watch as AI instantly reimagines your environment.
       </p>
 
       {state.error && (
-        <h1 className="text-destructive text-center mt-10">{state.error}</h1>
+        <p className="text-destructive text-center mt-4">{state.error}</p>
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 mt-10 gap-10">
-        {/* Image Selection */}
         <ImageSelection
           loading={state.loading}
           file={state.file}
           onFileSelected={onFileSelected}
         />
-        {/* Form Input Selection */}
-        <div>
-          {/* Room Type */}
-          <RoomForm loading={state.loading} regenerateImage={regenerateImage} />
-        </div>
+        <RoomForm loading={state.loading} regenerateImage={regenerateImage} />
       </div>
     </div>
   );
