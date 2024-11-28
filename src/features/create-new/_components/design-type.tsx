@@ -3,23 +3,27 @@ import Image from "next/image";
 
 const roomTypes = [
   {
-    type: "Living Room",
+    type: "Modern",
     image: "/livingroom.jpg", // Replace with an actual image URL
   },
   {
-    type: "Bedroom",
+    type: "Industrial",
     image: "/bedroom.jpg",
   },
   {
-    type: "Kitchen",
+    type: "Bohemian",
     image: "/kitchen.jpg",
   },
   {
-    type: "Bathroom",
+    type: "Traditional",
     image: "/bathroom.jpg",
   },
   {
-    type: "Dining Room",
+    type: "Rustic",
+    image: "/dinningroom.jpg",
+  },
+  {
+    type: "Minimalist",
     image: "/dinningroom.jpg",
   },
 ];
@@ -53,7 +57,8 @@ const DesignType = ({
               <Image
                 className={cn(
                   "h-[70px] rounded-md hover:scale-105 transition-all cursor-pointer",
-                  value === item.type && "border-2 border-purple-600"
+                  value === item.type && "border-2 border-purple-600",
+                  loading && "cursor-not-allowed"
                 )}
                 src={item.image}
                 width={100}

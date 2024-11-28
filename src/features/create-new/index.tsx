@@ -1,6 +1,6 @@
 "use client";
 
-import { useContext, useReducer } from "react";
+import { useContext, useEffect, useReducer, useState } from "react";
 
 // files
 import ImageSelection from "./_components/image-selection";
@@ -8,6 +8,7 @@ import RoomForm from "./_components/room-form";
 import axios from "axios";
 import { UserDetailContextType } from "@/types/userDetail";
 import { userDetailContext } from "@/contexts/userDetailContext";
+import OutputDialog from "./_components/output-dialog";
 
 // Define the state type
 type State = {
@@ -52,6 +53,11 @@ const CreateNew = () => {
     loading: false,
     error: "",
   });
+  const [result, setResult] = useState<null | {
+    aiImage: string;
+    originalImage: string;
+  }>(null);
+  const [open, setOpen] = useState(false);
 
   const onFileSelected = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
@@ -79,7 +85,13 @@ const CreateNew = () => {
           userEmail: userDetail.email,
           credits: userDetail.credits,
         });
-        console.log(response);
+        if (response.data.isSuccess) {
+          setResult({
+            aiImage: response.data.data.aiGeneratedImage,
+            originalImage: response.data.data.originalImage,
+          });
+          setOpen(true);
+        }
       } else {
         dispatch({ type: "SET_ERROR", payload: uploadedImage.data.error });
       }
@@ -95,6 +107,7 @@ const CreateNew = () => {
 
   return (
     <div>
+      <OutputDialog result={result} open={open} setOpen={setOpen} />
       <h2 className="font-bold text-2xl text-primary text-center">
         Experience the Magic of AI Remodeling
       </h2>
