@@ -21,7 +21,8 @@ const ImageSelection = ({
         htmlFor="upload-image"
         className={cn(
           "border rounded-xl border-dotted flex justify-center items-center bg-slate-200 border-primary p-28 cursor-pointer hover:shadow-lg shadow-sm",
-          file && "p-0 bg-white"
+          file && "p-0 bg-white",
+          loading && "cursor-not-allowed"
         )}
       >
         <div className={cn("")}>
