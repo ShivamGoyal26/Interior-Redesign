@@ -6,11 +6,11 @@ const EmptyData = () => {
   return (
     <div className="flex flex-col justify-center items-center">
       <Image
-        className="rounded-lg shadow-lg mb-4"
+        className="rounded-lg shadow-lg mb-4 w-[400px] h-[250px]"
         alt="Room preview"
         src="/bedroom.jpg"
         width={500}
-        height={300}
+        height={200}
       />
       <h2 className="font-medium text-lg text-gray-500 text-center">
         Create New AI Interior Design for your room
