@@ -10,6 +10,7 @@ import OutputDialog from "./_components/output-dialog";
 // Utilities
 import axios from "axios";
 import { userDetailContext } from "@/contexts/userDetailContext";
+import { redesignRoom, uploadImage } from "./services/create-new.service";
 
 // Types
 type State = {
@@ -86,27 +87,31 @@ const CreateNew = () => {
         dispatch({ type: "SET_STATE", payload: { loading: true } });
 
         // Upload image
-        const uploadedImage = await axios.post("/api/s3-upload", formData);
-        if (!uploadedImage.data.isSuccess) {
-          throw new Error(uploadedImage.data.error || "File upload failed");
+        const uploadedImage = await uploadImage(formData);
+        if (!uploadedImage.isSuccess) {
+          throw new Error(uploadedImage.error || "File upload failed");
         }
 
         // Process image
-        const response = await axios.post("/api/redesign-room", {
+        const response = await redesignRoom({
           ...params,
-          originalImage: uploadedImage.data.data,
-          userEmail: userDetail.email,
-          credits: userDetail.credits,
+          originalImage: uploadedImage.data!,
+          userEmail: userDetail.email!,
+          credits: Number(userDetail.credits),
         });
 
-        if (!response.data.isSuccess) {
-          throw new Error(response.data.error || "Room redesign failed");
+        if (!response.isSuccess) {
+          throw new Error(response.error || "Room redesign failed");
         }
 
-        setResult({
-          aiImage: response.data.data.aiGeneratedImage,
-          originalImage: response.data.data.originalImage,
-        });
+        if (response.data) {
+          setResult({
+            aiImage: response.data.aiGeneratedImage,
+            originalImage: response.data.originalImage,
+          });
+        } else {
+          throw new Error("Response data is undefined");
+        }
         setOpen(true);
       } catch (error: any) {
         const errorMessage =
