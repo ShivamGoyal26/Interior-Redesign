@@ -11,6 +11,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import useGetRooms from "@/features/dashboard/hooks/useGetRooms";
+import { useUser } from "@clerk/nextjs";
 
 type OutputDialogProps = {
   result: null | {
@@ -23,6 +25,13 @@ type OutputDialogProps = {
 
 const OutputDialog = ({ result, open, setOpen }: OutputDialogProps) => {
   const router = useRouter();
+  const { user } = useUser();
+
+  const { refetch } = useGetRooms({
+    isEnabled: true,
+    userEmail: user?.primaryEmailAddress?.emailAddress ?? "",
+  });
+
   return (
     <AlertDialog open={open}>
       <AlertDialogContent>
@@ -40,7 +49,10 @@ const OutputDialog = ({ result, open, setOpen }: OutputDialogProps) => {
             className="self-end"
             onClick={() => {
               setOpen(false);
-              router.push("/dashboard");
+              setTimeout(() => {
+                router.back();
+                refetch();
+              }, 500);
             }}
           >
             Close
