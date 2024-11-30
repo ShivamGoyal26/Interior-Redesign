@@ -4,6 +4,7 @@ import { useUser } from "@clerk/nextjs";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import axios from "axios";
 import React, { useEffect, useCallback, useState } from "react";
+import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 
 // Files
 import { userDetailContext } from "./contexts/userDetailContext";
@@ -23,7 +24,6 @@ const Provider = ({ children }: { children: React.ReactNode }) => {
         user,
       });
       setUserDetail(response.data.result);
-      console.log("response from the server", response);
     } catch (error) {
       console.log("error from the server", error);
     }
@@ -33,22 +33,31 @@ const Provider = ({ children }: { children: React.ReactNode }) => {
     if (user) verifyUser();
   }, [user, verifyUser]);
 
+  console.log(
+    "process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID",
+    process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID
+  );
+
   return (
     <QueryClientProvider client={queryClient}>
-      <userDetailContext.Provider
-        value={{
-          userDetail: userDetail || {
-            credits: "",
-            id: "",
-            name: "",
-            email: "",
-            image_url: "",
-          },
-          setUserDetail,
-        }}
+      <PayPalScriptProvider
+        options={{ clientId: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID! }}
       >
-        {children}
-      </userDetailContext.Provider>
+        <userDetailContext.Provider
+          value={{
+            userDetail: userDetail || {
+              credits: "",
+              id: "",
+              name: "",
+              email: "",
+              image_url: "",
+            },
+            setUserDetail,
+          }}
+        >
+          {children}
+        </userDetailContext.Provider>
+      </PayPalScriptProvider>
     </QueryClientProvider>
   );
 };

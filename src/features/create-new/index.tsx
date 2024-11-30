@@ -8,7 +8,6 @@ import RoomForm from "./_components/room-form";
 import OutputDialog from "./_components/output-dialog";
 
 // Utilities
-import axios from "axios";
 import { userDetailContext } from "@/contexts/userDetailContext";
 import { redesignRoom, uploadImage } from "./services/create-new.service";
 
