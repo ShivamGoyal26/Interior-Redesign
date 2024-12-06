@@ -1,14 +1,13 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { userDetailContext } from "@/contexts/userDetailContext";
-import { db } from "@/db";
-import { usersTable } from "@/db/schema";
-import { cn } from "@/lib/utils";
-import { PayPalButtons } from "@paypal/react-paypal-js";
-import { Loader, Loader2 } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useContext, useState } from "react";
+import { Loader2 } from "lucide-react";
+
+// Files
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import useUpdateUserCredits from "./hooks/useUpdateUserCredits";
+import { userDetailContext } from "@/contexts/userDetailContext";
 
 const CREDITS = [
   {
@@ -34,31 +33,11 @@ const CREDITS = [
 ];
 
 const BuyCredits = () => {
-  const { userDetail, setUserDetail } = useContext(userDetailContext);
   const [selected, setSelected] = useState<null | (typeof CREDITS)[0]>(null);
-  const [loading, setLoading] = useState(false);
-  const router = useRouter();
-
-  const updateCreditsInDB = async () => {
-    setLoading(true);
-    try {
-      const result = await db
-        .update(usersTable)
-        .set({
-          credits: userDetail.credits + selected?.credits,
-        })
-        .returning();
-
-      if (result[0]) {
-        setUserDetail(result[0]);
-        router.push("/dashboard");
-      }
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { loading, updateCreditsInDB } = useUpdateUserCredits({
+    redirect: true,
+  });
+  const { userDetail } = useContext(userDetailContext);
 
   return (
     <main>
@@ -93,7 +72,12 @@ const BuyCredits = () => {
 
       <div className="my-20">
         {selected && (
-          <Button disabled={loading} onClick={updateCreditsInDB}>
+          <Button
+            disabled={loading}
+            onClick={() =>
+              updateCreditsInDB(userDetail.credits + selected.credits)
+            }
+          >
             {loading ? (
               <Loader2 className="size-10 animate-spin text-white" />
             ) : (

@@ -10,6 +10,7 @@ import OutputDialog from "./_components/output-dialog";
 // Utilities
 import { userDetailContext } from "@/contexts/userDetailContext";
 import { redesignRoom, uploadImage } from "./services/create-new.service";
+import useUpdateUserCredits from "../buy-credits/hooks/useUpdateUserCredits";
 
 // Types
 type State = {
@@ -47,9 +48,7 @@ const initialState: State = {
 };
 
 const CreateNew = () => {
-  const { userDetail } = useContext(userDetailContext) ?? {
-    userDetail: { credits: 0 },
-  };
+  const { userDetail } = useContext(userDetailContext);
 
   const [state, dispatch] = useReducer(reducer, initialState);
   const [result, setResult] = useState<null | {
@@ -57,6 +56,9 @@ const CreateNew = () => {
     originalImage: string;
   }>(null);
   const [open, setOpen] = useState(false);
+  const { loading, updateCreditsInDB } = useUpdateUserCredits({
+    redirect: false,
+  });
 
   const onFileSelected = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -104,6 +106,7 @@ const CreateNew = () => {
         }
 
         if (response.data) {
+          updateCreditsInDB(userDetail.credits - 1);
           setResult({
             aiImage: response.data.aiGeneratedImage,
             originalImage: response.data.originalImage,
