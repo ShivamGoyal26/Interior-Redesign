@@ -5,9 +5,11 @@ import { userDetailContext } from "@/contexts/userDetailContext";
 import { UserDetailContextType } from "@/types/userDetail";
 import { UserButton } from "@clerk/nextjs";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useContext } from "react";
 
 const Header = () => {
+  const router = useRouter();
   const { userDetail } = useContext<UserDetailContextType | undefined>(
     userDetailContext
   ) || { userDetail: { credits: 0 } };
@@ -19,7 +21,11 @@ const Header = () => {
         <h1 className="text-lg font-bold">AI Room Design</h1>
       </div>
 
-      <Button variant={"ghost"} className="rounded-full text-primary">
+      <Button
+        onClick={() => router.push("/buy-credits")}
+        variant={"ghost"}
+        className="rounded-full text-primary"
+      >
         Buy More Credits
       </Button>
 
