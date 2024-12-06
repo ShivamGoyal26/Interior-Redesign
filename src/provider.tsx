@@ -9,6 +9,8 @@ import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 // Files
 import { userDetailContext } from "./contexts/userDetailContext";
 import { UserDetailContextType } from "./types/userDetail";
+import useVerifyUser from "./hooks/useVerifyUser";
+import { verifyUser } from "./services/verify-user";
 
 const queryClient = new QueryClient();
 
@@ -18,25 +20,18 @@ const Provider = ({ children }: { children: React.ReactNode }) => {
     null | UserDetailContextType["userDetail"]
   >(null);
 
-  const verifyUser = useCallback(async () => {
+  const fetchUser = useCallback(async () => {
     try {
-      const response = await axios.post("/api/verify-user", {
-        user,
-      });
-      setUserDetail(response.data.result);
+      const response = await verifyUser({ user });
+      setUserDetail(response.result);
     } catch (error) {
       console.log("error from the server", error);
     }
   }, [user]);
 
   useEffect(() => {
-    if (user) verifyUser();
-  }, [user, verifyUser]);
-
-  console.log(
-    "process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID",
-    process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID
-  );
+    if (user) fetchUser();
+  }, [user, fetchUser]);
 
   return (
     <QueryClientProvider client={queryClient}>

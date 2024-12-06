@@ -1,5 +1,6 @@
 import { getUserRooms } from "@/features/create-new/services/create-new.service";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
 
 type useGetRoomsProps = {
   isEnabled: boolean;
@@ -7,8 +8,11 @@ type useGetRoomsProps = {
 };
 
 const useGetRooms = ({ isEnabled, userEmail }: useGetRoomsProps) => {
+  const queryKey = ["user-rooms"];
+  const queryClient = useQueryClient();
+
   const response = useQuery({
-    queryKey: ["user-rooms"],
+    queryKey,
     queryFn: () =>
       getUserRooms({
         userEmail,
@@ -19,6 +23,12 @@ const useGetRooms = ({ isEnabled, userEmail }: useGetRoomsProps) => {
     refetchOnMount: false,
     refetchOnWindowFocus: false,
   });
+
+  useEffect(() => {
+    return () => {
+      queryClient.cancelQueries({ queryKey });
+    };
+  }, []);
 
   return { ...response };
 };

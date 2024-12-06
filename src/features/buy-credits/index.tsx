@@ -1,9 +1,14 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { userDetailContext } from "@/contexts/userDetailContext";
+import { db } from "@/db";
+import { usersTable } from "@/db/schema";
 import { cn } from "@/lib/utils";
 import { PayPalButtons } from "@paypal/react-paypal-js";
-import { useState } from "react";
+import { Loader, Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useContext, useState } from "react";
 
 const CREDITS = [
   {
@@ -29,11 +34,30 @@ const CREDITS = [
 ];
 
 const BuyCredits = () => {
+  const { userDetail, setUserDetail } = useContext(userDetailContext);
   const [selected, setSelected] = useState<null | (typeof CREDITS)[0]>(null);
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
-  const onPaymentSuccess = () => {
-    console.log("Payment success");
-    alert("Thanks for your payment");
+  const updateCreditsInDB = async () => {
+    setLoading(true);
+    try {
+      const result = await db
+        .update(usersTable)
+        .set({
+          credits: userDetail.credits + selected?.credits,
+        })
+        .returning();
+
+      if (result[0]) {
+        setUserDetail(result[0]);
+        router.push("/dashboard");
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -67,8 +91,17 @@ const BuyCredits = () => {
         })}
       </div>
 
-      <div className="mt-20">
+      <div className="my-20">
         {selected && (
+          <Button disabled={loading} onClick={updateCreditsInDB}>
+            {loading ? (
+              <Loader2 className="size-10 animate-spin text-white" />
+            ) : (
+              "Pay now"
+            )}
+          </Button>
+        )}
+        {/* {selected && (
           <PayPalButtons
             style={{ layout: "vertical" }}
             onApprove={async () => {
@@ -92,7 +125,7 @@ const BuyCredits = () => {
               });
             }}
           />
-        )}
+        )} */}
       </div>
     </main>
   );
