@@ -1,6 +1,7 @@
 import { userDetailContext } from "@/contexts/userDetailContext";
 import { db } from "@/db";
 import { usersTable } from "@/db/schema";
+import { eq } from "drizzle-orm";
 import { useRouter } from "next/navigation";
 import { useContext, useState } from "react";
 
@@ -11,7 +12,7 @@ type useUpdateUserCreditsParams = {
 const useUpdateUserCredits = ({
   redirect = false,
 }: useUpdateUserCreditsParams) => {
-  const { setUserDetail } = useContext(userDetailContext);
+  const { setUserDetail, userDetail } = useContext(userDetailContext);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
@@ -23,6 +24,7 @@ const useUpdateUserCredits = ({
         .set({
           credits: selectedCredits,
         })
+        .where(eq(usersTable.email, userDetail.email))
         .returning();
 
       if (result[0]) {
