@@ -7,8 +7,8 @@ type useGetRoomsProps = {
   userEmail: string;
 };
 
+const queryKey = ["user-rooms"];
 const useGetRooms = ({ isEnabled, userEmail }: useGetRoomsProps) => {
-  const queryKey = ["user-rooms"];
   const queryClient = useQueryClient();
 
   const response = useQuery({
@@ -24,13 +24,17 @@ const useGetRooms = ({ isEnabled, userEmail }: useGetRoomsProps) => {
     refetchOnWindowFocus: false,
   });
 
+  const resetQuery = () => {
+    queryClient.invalidateQueries({ queryKey });
+  };
+
   useEffect(() => {
     return () => {
       queryClient.cancelQueries({ queryKey });
     };
-  }, []);
+  }, [queryClient, queryKey]);
 
-  return { ...response };
+  return { ...response, resetQuery };
 };
 
 export default useGetRooms;

@@ -27,7 +27,7 @@ const OutputDialog = ({ result, open, setOpen }: OutputDialogProps) => {
   const router = useRouter();
   const { user } = useUser();
 
-  const { refetch } = useGetRooms({
+  const { resetQuery } = useGetRooms({
     isEnabled: true,
     userEmail: user?.primaryEmailAddress?.emailAddress ?? "",
   });
@@ -51,7 +51,9 @@ const OutputDialog = ({ result, open, setOpen }: OutputDialogProps) => {
               setOpen(false);
               setTimeout(() => {
                 router.back();
-                refetch();
+                setTimeout(() => {
+                  resetQuery();
+                }, 200);
               }, 500);
             }}
           >
