@@ -2,17 +2,15 @@
 
 import { useUser } from "@clerk/nextjs";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import axios from "axios";
 import React, { useEffect, useCallback, useState } from "react";
-import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
+import { PayPalScriptProvider } from "@paypal/react-paypal-js";
 
 // Files
 import { userDetailContext } from "./contexts/userDetailContext";
 import { UserDetailContextType } from "./types/userDetail";
-import useVerifyUser from "./hooks/useVerifyUser";
 import { verifyUser } from "./services/verify-user";
 
-const queryClient = new QueryClient();
+export const queryClient = new QueryClient();
 
 const Provider = ({ children }: { children: React.ReactNode }) => {
   const { user } = useUser();
@@ -30,7 +28,12 @@ const Provider = ({ children }: { children: React.ReactNode }) => {
   }, [user]);
 
   useEffect(() => {
-    if (user) fetchUser();
+    if (user) {
+      fetchUser();
+    } else {
+      queryClient.cancelQueries();
+      queryClient.clear();
+    }
   }, [user, fetchUser]);
 
   return (
